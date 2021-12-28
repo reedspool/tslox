@@ -82,4 +82,21 @@ describe("Scanner", () => {
         expect(mockOnError).not.toHaveBeenCalled();
 
     })
+
+    it("Handles various reserved words and identifiers", () => {
+        const mockOnError = jest.fn();
+        const scanner = new Scanner(
+            `or and x _next`,
+            mockOnError);
+
+        const tokens = scanner.scanTokens();
+
+        expect(mockOnError).not.toHaveBeenCalled();
+
+        expect(tokens[0]).toEqual(new Token(TokenType.OR, 'or', null, 1));
+        expect(tokens[1]).toEqual(new Token(TokenType.AND, 'and', null, 1));
+        expect(tokens[2]).toEqual(new Token(TokenType.IDENTIFIER, 'x', null, 1));
+        expect(tokens[3]).toEqual(new Token(TokenType.IDENTIFIER, '_next', null, 1));
+        expect(tokens).toHaveLength(5); // Including the EOF
+    });
 })

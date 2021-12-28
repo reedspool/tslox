@@ -1,6 +1,26 @@
 import { Token } from "./Token";
 import { TokenType } from "./TokenType";
 
+const keywords: { [s in string]: TokenType } =
+{
+    "and": TokenType.AND,
+    "class": TokenType.CLASS,
+    "else": TokenType.ELSE,
+    "false": TokenType.FALSE,
+    "for": TokenType.FOR,
+    "fun": TokenType.FUN,
+    "if": TokenType.IF,
+    "nil": TokenType.NIL,
+    "or": TokenType.OR,
+    "print": TokenType.PRINT,
+    "return": TokenType.RETURN,
+    "super": TokenType.SUPER,
+    "this": TokenType.THIS,
+    "true": TokenType.TRUE,
+    "var": TokenType.VAR,
+    "while": TokenType.WHILE,
+}
+
 export class Scanner {
     private source: string
     private tokens: Token[] = [];
@@ -58,6 +78,16 @@ export class Scanner {
         return c >= '0' && c <= '9';
     }
 
+    private isAlpha(c: string) {
+        return (c >= 'a' && c <= 'z') ||
+            (c >= 'A' && c <= 'Z') ||
+            c == '_';
+    }
+
+    private isAlphaNumeric(c: string) {
+        return this.isAlpha(c) || this.isDigit(c);
+    }
+
     private string() {
         while (this.peek() != '"' && !this.isAtEnd()) {
             if (this.peek() == '\n') this.line++;
@@ -91,6 +121,15 @@ export class Scanner {
         this.addToken(
             TokenType.NUMBER,
             parseFloat(this.source.substring(this.start, this.current)));
+    }
+
+    private identifier() {
+        while (this.isAlphaNumeric(this.peek())) this.advance();
+
+        const text = this.source.substring(this.start, this.current);
+        let type = keywords[text];
+        if (!type) type = TokenType.IDENTIFIER;
+        this.addToken(type);
     }
 
     private scanToken() {
@@ -146,6 +185,8 @@ export class Scanner {
             default:
                 if (this.isDigit(character)) {
                     this.number();
+                } else if (this.isAlpha(character)) {
+                    this.identifier();
                 } else {
                     this.onError(this.line, `Unexpected character '${character}'`);
                 }
