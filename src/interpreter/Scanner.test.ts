@@ -34,11 +34,11 @@ describe("Scanner", () => {
         expect(mockOnError).not.toHaveBeenCalled();
     })
 
-    it("Handles comments", () => {
+    it("Handles single-line comments", () => {
         const mockOnError = jest.fn();
         const scanner = new Scanner(
             `!
-             // This is a comment and shouldn't be called
+             // This is a comment and shouldn't be parsed
              *`,
             mockOnError);
 
@@ -48,6 +48,31 @@ describe("Scanner", () => {
             TokenType.BANG,
             TokenType.STAR,
             TokenType.EOF
+        ]);
+
+        expect(mockOnError).not.toHaveBeenCalled();
+    })
+
+    it("Handles C-style block comments", () => {
+        const mockOnError = jest.fn();
+        const scanner = new Scanner(
+            `!
+             /* This is a single-line block comment */
+             =
+             /* This is a
+              * multi-line block comment
+              */
+             /**/
+             *`,
+            mockOnError);
+
+        const tokens = scanner.scanTokens();
+
+        expect(tokens).toEqual([
+            new Token(TokenType.BANG, '!', null, 1),
+            new Token(TokenType.EQUAL, '=', null, 3),
+            new Token(TokenType.STAR, '*', null, 8),
+            new Token(TokenType.EOF, '', null, 8),
         ]);
 
         expect(mockOnError).not.toHaveBeenCalled();
