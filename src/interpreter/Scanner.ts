@@ -49,6 +49,15 @@ export class Scanner {
         return this.isAtEnd() ? '\0' : this.source.charAt(this.current);
     }
 
+    private peekNext() {
+        if (this.current + 1 >= this.source.length) return '\0';
+        return this.source.charAt(this.current + 1);
+    }
+
+    private isDigit(c: string) {
+        return c >= '0' && c <= '9';
+    }
+
     private string() {
         while (this.peek() != '"' && !this.isAtEnd()) {
             if (this.peek() == '\n') this.line++;
@@ -66,6 +75,22 @@ export class Scanner {
         // Trim the surrounding quotes
         const value = this.source.substring(this.start + 1, this.current - 1);
         this.addToken(TokenType.STRING, value);
+    }
+
+    private number() {
+        while (this.isDigit(this.peek())) this.advance();
+
+        // Look for a fractional part
+        if (this.peek() == '.' && this.isDigit(this.peekNext())) {
+            // Consume the "."
+            this.advance();
+
+            while (this.isDigit(this.peek())) this.advance();
+        }
+
+        this.addToken(
+            TokenType.NUMBER,
+            parseFloat(this.source.substring(this.start, this.current)));
     }
 
     private scanToken() {
@@ -119,7 +144,11 @@ export class Scanner {
             case '"': this.string(); break;
 
             default:
-                this.onError(this.line, `Unexpected character '${character}'`);
+                if (this.isDigit(character)) {
+                    this.number();
+                } else {
+                    this.onError(this.line, `Unexpected character '${character}'`);
+                }
                 break;
         }
     }

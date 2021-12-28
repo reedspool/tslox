@@ -62,8 +62,24 @@ describe("Scanner", () => {
         const tokens = scanner.scanTokens();
 
         expect(tokens[0]).toEqual(new Token(TokenType.STRING, '"test"', 'test', 1));
-        expect(tokens).toHaveLength(2);
+        expect(tokens).toHaveLength(2); // Including the EOF
 
         expect(mockOnError).not.toHaveBeenCalled();
+    })
+
+    it("Handles various numbers", () => {
+        const mockOnError = jest.fn();
+        const scanner = new Scanner(
+            `42 3.14159`,
+            mockOnError);
+
+        const tokens = scanner.scanTokens();
+
+        expect(tokens[0]).toEqual(new Token(TokenType.NUMBER, '42', 42, 1));
+        expect(tokens[1]).toEqual(new Token(TokenType.NUMBER, '3.14159', 3.14159, 1));
+        expect(tokens).toHaveLength(3); // Including the EOF
+
+        expect(mockOnError).not.toHaveBeenCalled();
+
     })
 })
