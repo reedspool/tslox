@@ -5,8 +5,8 @@ export class Interpreter {
     _hadError = false;
 
     run(source: string) {
-        const scanner = new Scanner(source);
-        const tokens = scanner.scanTokens(this.error.bind(this));
+        const scanner = new Scanner(source, this.error.bind(this));
+        const tokens = scanner.scanTokens();
 
         tokens.forEach(token => debug(token.toString()));
     }
