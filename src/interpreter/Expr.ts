@@ -78,3 +78,43 @@ function defineAstNode(baseName: string, className: ClassName, fields: Fields) {
 
     return eval(classSource);
 }
+
+export class ASTPrinter implements Visitor<string> {
+    print(expr: Expr): string {
+        return expr.accept(this);
+    }
+
+    parenthesize(name: string, ...exprs: Expr[]) {
+        let output: string[] = [];
+
+        output.push("(")
+        output.push(name)
+
+        exprs.forEach(expr => {
+            output.push(" ");
+            output.push(expr.accept(this));
+        })
+
+        output.push(")");
+
+        return output.join("");
+    }
+
+    visitBinaryExpr(expr: typeof ASTNode.Binary) {
+        return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
+    }
+
+    visitGroupingExpr(expr: typeof ASTNode.Grouping) {
+        return this.parenthesize("group", expr.expression);
+    }
+
+    visitLiteralExpr(expr: typeof ASTNode.Literal) {
+        // TODO: Undefined?
+        if (expr.value == null) return "nil";
+        return expr.value.toString();
+    }
+
+    visitUnaryExpr(expr: typeof ASTNode.Unary) {
+        return this.parenthesize(expr.operator.lexeme, expr.right);
+    }
+}

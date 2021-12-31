@@ -1,4 +1,4 @@
-import { ASTNode, Visitor, Expr } from "./Expr";
+import { ASTNode, Visitor, Expr, ASTPrinter } from "./Expr";
 import { Token } from "./Token";
 import { TokenType } from "./TokenType";
 
@@ -20,45 +20,6 @@ describe("Expr", () => {
 
     it("Can visit a Binary Expr", () => {
         // TODO: Extract this to a different file
-        class ASTPrinter implements Visitor<string> {
-            print(expr: Expr): string {
-                return expr.accept(this);
-            }
-
-            parenthesize(name: string, ...exprs: Expr[]) {
-                let output: string[] = [];
-
-                output.push("(")
-                output.push(name)
-
-                exprs.forEach(expr => {
-                    output.push(" ");
-                    output.push(expr.accept(this));
-                })
-
-                output.push(")");
-
-                return output.join("");
-            }
-
-            visitBinaryExpr(expr: typeof Binary) {
-                return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
-            }
-
-            visitGroupingExpr(expr: typeof Grouping) {
-                return this.parenthesize("group", expr.expression);
-            }
-
-            visitLiteralExpr(expr: typeof Literal) {
-                // TODO: Undefined?
-                if (expr.value == null) return "nil";
-                return expr.value.toString();
-            }
-
-            visitUnaryExpr(expr: typeof Unary) {
-                return this.parenthesize(expr.operator.lexeme, expr.right);
-            }
-        }
 
 
         const expr = new Binary(
@@ -67,7 +28,6 @@ describe("Expr", () => {
             new Literal());
 
         expect(new ASTPrinter().print(expr)).toBe("(and nil nil)");
-
 
         const expr2 = new Binary(
             new Unary(
