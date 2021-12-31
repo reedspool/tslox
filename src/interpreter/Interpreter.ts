@@ -1,5 +1,9 @@
 import { debug } from "../debug";
 import { Scanner } from "./Scanner";
+import { Parser } from "./Parser";
+import { Token } from "./Token";
+import { TokenType } from "./TokenType";
+import { ASTPrinter } from "./Expr";
 
 export class Interpreter {
     _hadError = false;
@@ -8,13 +12,32 @@ export class Interpreter {
     _output = "";
 
     run(source: string) {
-        const scanner = new Scanner(source, this.error.bind(this));
+        const scanner = new Scanner(source, this.lineError.bind(this));
         const tokens = scanner.scanTokens();
+        const parser = new Parser(tokens, this.tokenError.bind(this));
+        const expr = parser.parse();
 
-        tokens.forEach(token => this.println(token.toString()));
+        // Stop if there was a syntax error.
+        if (this._hadError) return;
+
+        if (!expr) {
+            this.println("Parsing Error");
+            return;
+        }
+
+        this.println(new ASTPrinter().print(expr));
     }
 
-    error(line: number, message: string) { this.report(line, "", message); }
+    lineError(line: number, message: string) { this.report(line, "", message); }
+
+    tokenError(token: Token, message: string) {
+        this.report(
+            token.line,
+            token.type == TokenType.EOF
+                ? " at end"
+                : ` at '${token.lexeme}'`,
+            message);
+    }
 
     report(line: number, where: string, message: string) {
         console.error(`[line ${line}] Error${where}: ${message}`);

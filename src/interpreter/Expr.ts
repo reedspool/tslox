@@ -1,5 +1,5 @@
 export abstract class Expr {
-    abstract accept<R>(visitor: Visitor<R>);
+    abstract accept<R>(visitor: Visitor<R>): R;
 }
 
 // Fancy type to allow arbitrary children of Expr not known at compile time
