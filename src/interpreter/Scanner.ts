@@ -19,6 +19,9 @@ const keywords: { [s in string]: TokenType } =
     "true": TokenType.TRUE,
     "var": TokenType.VAR,
     "while": TokenType.WHILE,
+
+    // Yes Operator!
+    "yes": TokenType.YES
 }
 
 export class Scanner {

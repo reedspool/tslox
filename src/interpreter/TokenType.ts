@@ -44,5 +44,8 @@ export enum TokenType {
     TRUE = "TRUE",
     VAR = "VAR",
     WHILE = "WHILE",
-    EOF = "EOF"
+    EOF = "EOF",
+
+    // Yes Operator!
+    YES = "YES"
 }
