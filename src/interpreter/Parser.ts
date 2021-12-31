@@ -56,7 +56,7 @@ export class Parser {
     private previous(): Token { return this.tokens[this.current - 1]; }
 
     private expression(): Expr {
-        return this.equality();
+        return this.comma();
     }
 
     private parseLeftRecursive(operand: string, ...types: TokenType[]): Expr {
@@ -72,6 +72,13 @@ export class Parser {
         }
 
         return expr;
+    }
+
+    private comma(): Expr {
+        return this.parseLeftRecursive(
+            "equality",
+            TokenType.COMMA
+        );
     }
 
     private equality(): Expr {
