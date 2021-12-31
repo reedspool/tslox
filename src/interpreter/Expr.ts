@@ -23,8 +23,6 @@ export interface Visitor<R> {
 // to generate all of those classes at runtime.
 
 defineAst("Expr", {
-    // Useless concrete child of Expr for testing
-    "Unit": [],
     "Binary": ["left", "operator", "right"],
     "Grouping": ["expression"],
     "Literal": ["value"],

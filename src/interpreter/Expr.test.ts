@@ -2,14 +2,14 @@ import { ASTNode, Visitor, Expr } from "./Expr";
 import { Token } from "./Token";
 import { TokenType } from "./TokenType";
 
-const { Binary, Unit, Grouping, Literal, Unary } = ASTNode;
+const { Binary, Grouping, Literal, Unary } = ASTNode;
 
 describe("Expr", () => {
     it("Can construct a Binary Expr", () => {
         const expr = new Binary(
-            new Unit(),
+            new Literal(),
             new Token(TokenType.AND, "and", null, 1),
-            new Unit());
+            new Literal());
 
         expect(expr).toEqual({
             left: {},
@@ -41,10 +41,6 @@ describe("Expr", () => {
                 return output.join("");
             }
 
-            visitUnitExpr(expr: typeof Unit) {
-                return "unit";
-            }
-
             visitBinaryExpr(expr: typeof Binary) {
                 return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
             }
@@ -66,11 +62,11 @@ describe("Expr", () => {
 
 
         const expr = new Binary(
-            new Unit(),
+            new Literal(),
             new Token(TokenType.AND, "and", null, 1),
-            new Unit());
+            new Literal());
 
-        expect(new ASTPrinter().print(expr)).toBe("(and unit unit)");
+        expect(new ASTPrinter().print(expr)).toBe("(and nil nil)");
 
 
         const expr2 = new Binary(
