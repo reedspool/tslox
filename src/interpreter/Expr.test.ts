@@ -18,17 +18,16 @@ describe("Expr", () => {
         })
     })
 
-    it("Can visit a Binary Expr", () => {
-        // TODO: Extract this to a different file
-
-
+    it("Can visit a simple Binary Expr", () => {
         const expr = new Binary(
             new Literal(),
             new Token(TokenType.AND, "and", null, 1),
             new Literal());
 
         expect(new ASTPrinter().print(expr)).toBe("(and nil nil)");
+    });
 
+    it("Can visit a complex Binary Expr", () => {
         const expr2 = new Binary(
             new Unary(
                 new Token(TokenType.MINUS, "-", null, 1),

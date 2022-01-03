@@ -62,7 +62,7 @@ export class Scanner {
 
     private match(expected: string) {
         if (this.isAtEnd()) return false;
-        if (this.source.charAt(this.current) != expected) return false;
+        if (this.source.charAt(this.current) !== expected) return false;
 
         this.current++;
         return true;
@@ -84,7 +84,7 @@ export class Scanner {
     private isAlpha(c: string) {
         return (c >= 'a' && c <= 'z') ||
             (c >= 'A' && c <= 'Z') ||
-            c == '_';
+            c === '_';
     }
 
     private isAlphaNumeric(c: string) {
@@ -92,8 +92,8 @@ export class Scanner {
     }
 
     private string() {
-        while (this.peek() != '"' && !this.isAtEnd()) {
-            if (this.peek() == '\n') this.line++;
+        while (this.peek() !== '"' && !this.isAtEnd()) {
+            if (this.peek() === '\n') this.line++;
             this.advance();
         }
 
@@ -114,7 +114,7 @@ export class Scanner {
         while (this.isDigit(this.peek())) this.advance();
 
         // Look for a fractional part
-        if (this.peek() == '.' && this.isDigit(this.peekNext())) {
+        if (this.peek() === '.' && this.isDigit(this.peekNext())) {
             // Consume the "."
             this.advance();
 
@@ -167,13 +167,13 @@ export class Scanner {
             case '/':
                 if (this.match('/')) {
                     // A comment goes until the end of the line.
-                    while (this.peek() != '\n' && !this.isAtEnd()) this.advance();
+                    while (this.peek() !== '\n' && !this.isAtEnd()) this.advance();
                 } else if (this.match('*')) {
                     // Advance until we reach "*/"
                     while (
-                        !(this.peek() == '*' && this.peekNext() == '/')
+                        !(this.peek() === '*' && this.peekNext() === '/')
                         && !this.isAtEnd()) {
-                        if (this.peek() == '\n') this.line++;
+                        if (this.peek() === '\n') this.line++;
                         this.advance();
                     }
 

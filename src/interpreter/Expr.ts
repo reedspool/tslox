@@ -14,9 +14,9 @@ export const ASTNode: ASTNodeType = {};
 // that a given Visitor will implement a visit method for each ASTNode class.
 // I don't see any way around this except converting to the same meta pipeline
 // for generating the script file as Nystrom uses.
-export interface Visitor<R> {
-
-}
+//
+// @ts-ignore "R is unused," but we don't care since implementors will use it
+export interface Visitor<R> { }
 
 // Difference from the book:
 // Instead of writing a new file with all the class declarations, use eval
@@ -76,6 +76,7 @@ function defineAstNode(baseName: string, className: ClassName, fields: Fields) {
         ${className}
     `;
 
+    //@ts-ignore Yes I know eval can be harmful. Don't try this at home.
     return eval(classSource);
 }
 
