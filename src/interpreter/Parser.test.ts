@@ -92,4 +92,21 @@ describe("Parser", () => {
                     new Token(TokenType.PLUS, "+", null, 1),
                     new ASTNode.Literal(42))));
     });
+
+    it("Ch 6, challenge 3: Error on no left hand side for binary", () => {
+        const mockOnError = jest.fn();
+        const tokens: Token[] = [
+            new Token(TokenType.GREATER_EQUAL, ">=", null, 1),
+            new Token(TokenType.NUMBER, "7", 7, 1),
+            new Token(TokenType.EOF, "", null, 1)
+        ];
+        const parser = new Parser(tokens, mockOnError);
+        const result = parser.parse();
+
+        expect(mockOnError).toBeCalledTimes(1);
+        expect(mockOnError)
+            .toBeCalledWith(
+                { "lexeme": ">=", "line": 1, "literal": null, "type": "GREATER_EQUAL" },
+                "Expect expression before >=.");
+    });
 });

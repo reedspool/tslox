@@ -60,7 +60,22 @@ export class Parser {
     }
 
     private parseLeftRecursive(operand: string, ...types: TokenType[]): Expr {
-        //@ts-ignore: Dynamically access this class's methods with a string
+        // Ch 6, challenge 3
+        // If, before parsing the left hand side, we find one of the current
+        // operands, then that's an error
+        if (this.match(...types)) {
+            const operator = this.previous();
+
+            // Parse and discard
+            // @ts-ignore: Dynamically access this class's methods with a string
+            this[operand]();
+
+            throw this.error(
+                operator,
+                `Expect expression before ${operator.lexeme}.`);
+        }
+
+        // @ts-ignore: Dynamically access this class's methods with a string
         let expr = this[operand]();
 
         while (this.match(...types)) {
