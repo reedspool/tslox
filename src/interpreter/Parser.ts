@@ -76,9 +76,28 @@ export class Parser {
 
     private comma(): Expr {
         return this.parseLeftRecursive(
-            "equality",
+            "ternary",
             TokenType.COMMA
         );
+    }
+
+    // Support C-style ternary operator (?:)
+    // See here for associativity note:
+    // https://en.cppreference.com/w/c/language/operator_precedence#cite_note-3
+    // Challeng 2, chapter 6
+    // https://craftinginterpreters.com/parsing-expressions.html#challenges
+    private ternary(): Expr {
+        const expr = this.equality();
+
+        if (this.match(TokenType.QUESTION)) {
+            const middle = this.expression();
+            this.consume(TokenType.COLON, "Expected ':'.");
+            const right = this.expression();
+
+            return new ASTNode.Ternary(expr, middle, right);
+        }
+
+        return expr;
     }
 
     private equality(): Expr {

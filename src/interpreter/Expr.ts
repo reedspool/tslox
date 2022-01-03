@@ -24,6 +24,7 @@ export interface Visitor<R> { }
 
 defineAst("Expr", {
     "Binary": ["left", "operator", "right"],
+    "Ternary": ["left", "middle", "right"],
     "Grouping": ["expression"],
     "Literal": ["value"],
     "Unary": ["operator", "right"]
@@ -103,6 +104,10 @@ export class ASTPrinter implements Visitor<string> {
 
     visitBinaryExpr(expr: typeof ASTNode.Binary) {
         return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
+    }
+
+    visitTernaryExpr(expr: typeof ASTNode.Binary) {
+        return this.parenthesize("ternary", expr.left, expr.middle, expr.right);
     }
 
     visitGroupingExpr(expr: typeof ASTNode.Grouping) {

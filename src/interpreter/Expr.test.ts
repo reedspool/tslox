@@ -2,7 +2,7 @@ import { ASTNode, Visitor, Expr, ASTPrinter } from "./Expr";
 import { Token } from "./Token";
 import { TokenType } from "./TokenType";
 
-const { Binary, Grouping, Literal, Unary } = ASTNode;
+const { Binary, Grouping, Literal, Unary, Ternary } = ASTNode;
 
 describe("Expr", () => {
     it("Can construct a Binary Expr", () => {
@@ -37,6 +37,15 @@ describe("Expr", () => {
                 new Literal(45.67)));
 
         expect(new ASTPrinter().print(expr2)).toBe("(* (- 123) (group 45.67))");
+    })
+
+    it("Can visit a simple Ternary Expr", () => {
+        const expr = new Ternary(
+            new Literal(5),
+            new Literal(4),
+            new Literal(3));
+
+        expect(new ASTPrinter().print(expr)).toBe("(ternary 5 4 3)");
     })
 
     it("Challenge, Chapter 5 #3 RPN printer", () => {

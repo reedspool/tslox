@@ -6,13 +6,15 @@ describe("Scanner", () => {
     it("Scans single and double character lexemes space separated", () => {
         const mockOnError = jest.fn();
         const scanner = new Scanner(
-            "! != < <= > >= ( ) { } , . - + ; *",
+            "! ? : != < <= > >= ( ) { } , . - + ; *",
             mockOnError);
 
         const tokens = scanner.scanTokens();
 
         expect(tokens.map(token => token.type)).toEqual([
             TokenType.BANG,
+            TokenType.QUESTION,
+            TokenType.COLON,
             TokenType.BANG_EQUAL,
             TokenType.LESS,
             TokenType.LESS_EQUAL,
