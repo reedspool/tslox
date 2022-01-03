@@ -1,39 +1,39 @@
-import { Interpreter } from "./Interpreter";
+import { Runner } from "./Runner";
 
-describe("Interpreter", () => {
+describe("Runner", () => {
     it("runs almost empty program", () => {
-        const interpreter = new Interpreter();
+        const runner = new Runner();
 
-        interpreter.run("0");
+        runner.run("0");
 
-        expect(interpreter.hadError()).toBe(false);
+        expect(runner.hadError()).toBe(false);
     })
 
     it("runs a program with an error", () => {
-        const interpreter = new Interpreter();
+        const runner = new Runner();
 
         // Mock console.error, so we don't print expected errors
         const consoleErrorMock = jest.spyOn(global.console, 'error');
         consoleErrorMock.mockImplementation(() => { /* noop */ });
 
-        interpreter.run("$/%");
+        runner.run("$/%");
 
         expect(consoleErrorMock).toHaveBeenCalled();
-        expect(interpreter.hadError()).toBe(true);
+        expect(runner.hadError()).toBe(true);
     })
 
     it("Output collects", () => {
-        const interpreter = new Interpreter();
+        const runner = new Runner();
 
         jest.spyOn(global.console, 'error');
 
-        interpreter.run("4 + 5");
+        runner.run("4 + 5");
 
-        expect(interpreter.output()).toBe(`(+ 4 5)\n`);
+        expect(runner.output()).toBe(`(+ 4 5)\n`);
 
-        interpreter.run("4 + 5 - (5 * 6)");
+        runner.run("4 + 5 - (5 * 6)");
 
-        expect(interpreter.output()).toBe(
+        expect(runner.output()).toBe(
             `(+ 4 5)
 (- (+ 4 5) (group (* 5 6)))
 `);

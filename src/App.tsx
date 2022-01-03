@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Interpreter } from "./interpreter"
+import { Runner } from "./interpreter"
 import './App.css';
 
 function App() {
     const defaultOutputText = "Your output will appear here";
-    const [interpreter, setInterpreter] = useState<Interpreter>(() => new Interpreter());
+    const [runner, setRunner] = useState<Runner>(() => new Runner());
     const [output, setOutput] = useState<string>(defaultOutputText);
     const inputRef = useRef<HTMLInputElement>();
 
@@ -14,17 +14,17 @@ function App() {
 
         // When the user hits enter,
         // Then run the code through the interpreter
-        interpreter.run(elInput.value);
+        runner.run(elInput.value);
 
         // Update the output state because React needs to know to rerender
-        setOutput(interpreter.output());
+        setOutput(runner.output());
 
         // Then clear out the text box
         elInput.value = "";
     }
 
     function clearOutput() {
-        interpreter.clearOutput();
+        runner.clearOutput();
         setOutput("");
     }
 
