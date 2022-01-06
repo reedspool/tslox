@@ -29,14 +29,12 @@ describe("Runner", () => {
 
         runner.run("4 + 5");
 
-        expect(runner.output()).toBe(`(+ 4 5)\n`);
+        expect(runner.output()).toBe(`9\n`);
 
         runner.run("4 + 5 - (5 * 6)");
 
         expect(runner.output()).toBe(
-            `(+ 4 5)
-(- (+ 4 5) (group (* 5 6)))
-`);
+            `9\n-21\n`);
 
         expect(console.error).not.toHaveBeenCalled();
     })

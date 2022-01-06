@@ -3,12 +3,25 @@ import { Parser } from "./Parser";
 import { Token } from "./Token";
 import { TokenType } from "./TokenType";
 import { ASTPrinter } from "./Expr";
+import { Interpreter, RuntimeError } from "./Interpreter";
 
 export class Runner {
+    interpreter: Interpreter;
     _hadError = false;
+    _hadRuntimeError = false;
 
     // Difference from the book: Collect all the output in a string
     _output = "";
+
+    constructor() {
+        // Difference: The book stores the interpreter as a static field,
+        // because when the interpreter stores global values, those should
+        // persist throughout the REPL session. We're going to allow
+        // run() to be called as often as the user likes, so this is no problem
+        this.interpreter = new Interpreter(
+            this.println.bind(this),
+            this.runtimeError.bind(this));
+    }
 
     run(source: string) {
         const scanner = new Scanner(source, this.lineError.bind(this));
@@ -24,7 +37,7 @@ export class Runner {
             return;
         }
 
-        this.println(new ASTPrinter().print(expr));
+        this.interpreter.interpret(expr);
     }
 
     private lineError(line: number, message: string) {
@@ -40,14 +53,25 @@ export class Runner {
             message);
     }
 
+    private runtimeError(error: RuntimeError) {
+        console.error(`${error.toString()}\n[line ${error.token.line}]`);
+        this._hadRuntimeError = true;
+    }
+
     private report(line: number, where: string, message: string) {
         console.error(`[line ${line}] Error${where}: ${message}`);
         this._hadError = true;
     }
 
-    hadError() { return this._hadError; }
+    // Difference: In the book, these two error cases cause a different process
+    // exit code. 65 for hadError, and 70 for hadRuntimeError. We're not doing
+    // that yet.
+    hadError() { return this._hadError || this._hadRuntimeError; }
 
-    resetError() { this._hadError = false; }
+    resetError() {
+        this._hadError = false;
+        this._hadRuntimeError = false;
+    }
 
     private print(output: string) { this._output += output; }
 
