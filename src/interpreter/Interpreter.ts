@@ -106,17 +106,15 @@ export class Interpreter implements Visitor<any> {
                 this.checkNumberOperands(expr.operator, left, right);
                 return left - right;
             case TokenType.PLUS:
-                if (typeof left === "number" && typeof right === "number") {
+                // Ch 7 Challenge 2, allow + to work with mismatched types
+                if ((typeof left === "number" || typeof left === "string") &&
+                    (typeof right === "number" || typeof right === "string")) {
+                    //@ts-ignore: TypeScript doesn't like precisely what we want
                     return left + right;
                 }
-
-                if (typeof left === "string" && typeof right === "string") {
-                    return left + right;
-                }
-
                 throw new RuntimeError(
                     expr.operator,
-                    "Operands must be two numbers or two strings.")
+                    "Operands must each be a string or a number");
                 break;
             case TokenType.SLASH:
                 this.checkNumberOperands(expr.operator, left, right);
