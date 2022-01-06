@@ -17,6 +17,22 @@ describe("Parser", () => {
         expect(result).toEqual(new ASTNode.Literal(5));
     });
 
+    it("Parses a simple unary expression", () => {
+        const mockOnError = jest.fn();
+        const tokens: Token[] = [
+            new Token(TokenType.MINUS, "-", null, 1),
+            new Token(TokenType.NUMBER, "5", 5, 1),
+            new Token(TokenType.EOF, "", null, 1)
+        ];
+        const parser = new Parser(tokens, mockOnError);
+        const result = parser.parse();
+
+        expect(mockOnError).not.toBeCalled();
+        expect(result).toEqual(new ASTNode.Unary(
+            new Token(TokenType.MINUS, "-", null, 1),
+            new ASTNode.Literal(5)));
+    });
+
     it("Chapter 6, challenge 1: Parses a simple comma expression", () => {
         const mockOnError = jest.fn();
         const tokens: Token[] = [

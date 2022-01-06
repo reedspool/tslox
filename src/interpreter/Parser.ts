@@ -39,6 +39,16 @@ export class Parser {
         return false;
     }
 
+    private matchNoAdvance(...types: TokenType[]): boolean {
+        for (let type of types) {
+            if (this.check(type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private check(type: TokenType): boolean {
         if (this.isAtEnd()) return false;
         return this.peek().type === type;
@@ -63,7 +73,10 @@ export class Parser {
         // Ch 6, challenge 3
         // If, before parsing the left hand side, we find one of the current
         // operands, then that's an error
-        if (this.match(...types)) {
+        // Special case: If minus, then it's a unary operator, disregard
+        if (this.matchNoAdvance(...types) &&
+            this.peek().type !== TokenType.MINUS) {
+            this.advance();
             const operator = this.previous();
 
             // Parse and discard
