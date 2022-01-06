@@ -118,6 +118,11 @@ export class Interpreter implements Visitor<any> {
                 break;
             case TokenType.SLASH:
                 this.checkNumberOperands(expr.operator, left, right);
+                if (right === 0) {
+                    throw new RuntimeError(
+                        expr.operator,
+                        "Attempted division by zero.");
+                }
                 return left / right;
             case TokenType.STAR:
                 this.checkNumberOperands(expr.operator, left, right);
