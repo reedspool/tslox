@@ -1,14 +1,11 @@
-export abstract class Expr {
-    abstract accept<R>(visitor: Visitor<R>): R;
-}
-
-// Fancy type to allow arbitrary children of Expr not known at compile time
-type ASTNodeType<A extends Expr = any> = {
-    [s in string]: A
-};
-
-export const ASTNode: ASTNodeType = {};
-
+//
+//
+// Difference from the book:
+// Instead of writing a new file with all the class declarations, use eval
+// to generate all of those classes at runtime.
+//
+//
+//
 // TODO:
 // By generating the ASTNode classes at runtime, we lose compile time checks
 // that a given Visitor will implement a visit method for each ASTNode class.
@@ -17,12 +14,25 @@ export const ASTNode: ASTNodeType = {};
 //
 // @ts-ignore "R is unused," but we don't care since implementors will use it
 export interface Visitor<R> { }
+export interface ExprVisitor<R> { }
+export interface StmtVisitor<R> { }
 
-// Difference from the book:
-// Instead of writing a new file with all the class declarations, use eval
-// to generate all of those classes at runtime.
+export abstract class Expr {
+    abstract accept<R>(visitor: ExprVisitor<R>): R;
+}
 
-defineAst("Expr", {
+export abstract class Stmt {
+    abstract accept<R>(visitor: StmtVisitor<R>): R;
+}
+
+// Fancy type to allow arbitrary children of Expr not known at compile time
+type ASTNodeType<A extends Expr = any> = {
+    [s in string]: A
+};
+
+// TODO Rename ASTNode to "ExprNode"
+export const ASTNode: ASTNodeType = {};
+defineAst("Expr", ASTNode, {
     "Binary": ["left", "operator", "right"],
     "Ternary": ["left", "middle", "right"],
     "Grouping": ["expression"],
@@ -30,16 +40,22 @@ defineAst("Expr", {
     "Unary": ["operator", "right"]
 })
 
+export const StmtNode: ASTNodeType = {};
+defineAst("Stmt", StmtNode, {
+    "Expression": ["expression"],
+    "Print": ["expression"]
+})
+
 type ClassName = string;
 type Fields = string[];
 
-function defineAst(baseName: string, classes: { [s in ClassName]: Fields }) {
+function defineAst(baseName: string, container: ASTNodeType, classes: { [s in ClassName]: Fields }) {
     Object.entries(classes).forEach(([name, fields]) => {
         const clazz = defineAstNode(baseName, name, fields);
 
         // Add a static member of the main export Expr, so we can access this
         // constructor from elsewhere
-        ASTNode[name] = clazz;
+        container[name] = clazz;
     });
 }
 

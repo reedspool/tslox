@@ -1,5 +1,5 @@
 import { Token } from "./Token";
-import { Expr, ASTNode } from "./Expr";
+import { Expr, ASTNode, Stmt, StmtNode } from "./Expr";
 import { TokenType } from "./TokenType";
 
 export class ParseError extends Error { };
@@ -17,15 +17,12 @@ export class Parser {
         this.onError = onError;
     }
 
-    parse(): Expr | null {
-        try {
-            return this.expression();
-        } catch (error) {
-            if (error instanceof ParseError) return null;
-
-            // If it's not a parse error, re-throw
-            throw error;
+    parse(): Stmt[] {
+        const statements: Stmt[] = [];
+        while (!this.isAtEnd()) {
+            statements.push(this.statement());
         }
+        return statements;
     }
 
     private match(...types: TokenType[]): boolean {
@@ -64,6 +61,24 @@ export class Parser {
     private peek(): Token { return this.tokens[this.current]; }
 
     private previous(): Token { return this.tokens[this.current - 1]; }
+
+    private statement(): Stmt {
+        if (this.match(TokenType.PRINT)) return this.printStatement();
+
+        return this.expressionStatement();
+    }
+
+    private expressionStatement(): Stmt {
+        const expr: Expr = this.expression();
+        this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+        return new StmtNode.Expression(expr);
+    }
+
+    private printStatement(): Stmt {
+        const value: Expr = this.expression();
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        return new StmtNode.Print(value);
+    }
 
     private expression(): Expr {
         return this.comma();

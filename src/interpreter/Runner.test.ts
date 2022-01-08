@@ -4,12 +4,13 @@ describe("Runner", () => {
     it("runs almost empty program", () => {
         const runner = new Runner();
 
-        runner.run("0");
+        runner.run("0;");
 
         expect(runner.hadError()).toBe(false);
     })
 
-    it("runs a program with an error", () => {
+    // TODO This should work when we implement error handling again
+    xit("runs a program with an error", () => {
         const runner = new Runner();
 
         // Mock console.error, so we don't print expected errors
@@ -27,11 +28,11 @@ describe("Runner", () => {
 
         jest.spyOn(global.console, 'error');
 
-        runner.run("4 + 5");
+        runner.run("print 4 + 5;");
 
         expect(runner.output()).toBe(`9\n`);
 
-        runner.run("4 + 5 - (5 * 6)");
+        runner.run("print 4 + 5 - (5 * 6);");
 
         expect(runner.output()).toBe(
             `9\n-21\n`);

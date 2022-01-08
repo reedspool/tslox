@@ -1,6 +1,6 @@
 import { TokenType } from "./TokenType";
 import { Token } from "./Token";
-import { Visitor, ASTNode, Expr } from "./Expr";
+import { ExprVisitor, ASTNode, Expr, Stmt, StmtNode, StmtVisitor } from "./Expr";
 
 export class RuntimeError extends Error {
     token: Token;
@@ -11,7 +11,7 @@ export class RuntimeError extends Error {
     }
 };
 
-export class Interpreter implements Visitor<any> {
+export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     onOutput: (output: string) => void;
     onError: (error: RuntimeError) => void;
 
@@ -26,15 +26,20 @@ export class Interpreter implements Visitor<any> {
         this.onError = onError;
     }
 
-    interpret(expression: Expr) {
+    interpret(statements: Stmt[]) {
         try {
-            const value = this.evaluate(expression);
-            this.onOutput(this.stringify(value));
+            for (const statement of statements) {
+                this.execute(statement);
+            }
         } catch (error) {
             // If this is not a runtime error, don't attempt our error handling
             if (!(error instanceof RuntimeError)) throw error;
             this.onError(error);
         }
+    }
+
+    private execute(stmt: Stmt) {
+        return stmt.accept(this);
     }
 
     private evaluate(expr: Expr): any {
@@ -79,6 +84,15 @@ export class Interpreter implements Visitor<any> {
     private checkNumberOperands(operator: Token, left: any, right: any) {
         if (typeof left === "number" && typeof right === "number") return;
         throw new RuntimeError(operator, "Operands must be a numbers.");
+    }
+
+    visitExpressionStmt(stmt: typeof StmtNode.Expression) {
+        this.evaluate(stmt.expression);
+    }
+
+    visitPrintStmt(stmt: typeof StmtNode.Print) {
+        const value = this.evaluate(stmt.expression);
+        this.onOutput(this.stringify(value));
     }
 
     visitBinaryExpr(expr: typeof ASTNode.Binary) {

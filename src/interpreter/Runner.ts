@@ -27,17 +27,17 @@ export class Runner {
         const scanner = new Scanner(source, this.lineError.bind(this));
         const tokens = scanner.scanTokens();
         const parser = new Parser(tokens, this.tokenError.bind(this));
-        const expr = parser.parse();
+        const statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (this._hadError) return;
 
-        if (!expr) {
+        if (!statements) {
             this.println("Parsing Error");
             return;
         }
 
-        this.interpreter.interpret(expr);
+        this.interpreter.interpret(statements);
     }
 
     private lineError(line: number, message: string) {

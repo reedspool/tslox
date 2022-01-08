@@ -1,5 +1,5 @@
 import { Interpreter, RuntimeError } from "./Interpreter";
-import { ASTNode } from "./Expr";
+import { ASTNode, StmtNode } from "./Expr";
 import { Token } from "./Token";
 import { TokenType } from "./TokenType";
 
@@ -9,7 +9,7 @@ describe("Interpreter", () => {
         const onError = jest.fn();
         const interpreter = new Interpreter(onOutput, onError);
 
-        interpreter.interpret(new ASTNode.Literal(9));
+        interpreter.interpret([new StmtNode.Print(new ASTNode.Literal(9))]);
 
         expect(onOutput).toHaveBeenCalledTimes(1);
         expect(onOutput).toHaveBeenCalledWith("9");
@@ -22,10 +22,10 @@ describe("Interpreter", () => {
         const interpreter = new Interpreter(onOutput, onError);
 
         interpreter.interpret(
-            new ASTNode.Binary(
+            [new StmtNode.Print(new ASTNode.Binary(
                 new ASTNode.Literal("scone"),
                 new Token(TokenType.PLUS, "+", null, 1),
-                new ASTNode.Literal(4)));
+                new ASTNode.Literal(4)))]);
 
         expect(onError).not.toHaveBeenCalled();
         expect(onOutput).toHaveBeenCalledTimes(1);
@@ -38,10 +38,10 @@ describe("Interpreter", () => {
         const interpreter = new Interpreter(onOutput, onError);
 
         interpreter.interpret(
-            new ASTNode.Binary(
+            [new StmtNode.Expression(new ASTNode.Binary(
                 new ASTNode.Literal(50),
                 new Token(TokenType.SLASH, "/", null, 1),
-                new ASTNode.Literal(0)));
+                new ASTNode.Literal(0)))]);
 
         expect(onOutput).not.toHaveBeenCalled();
         expect(onError).toHaveBeenCalledTimes(1);
